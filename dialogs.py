@@ -1,10 +1,12 @@
 import os.path
 import shutil
+from datetime import datetime
 
 from PySide6.QtWidgets import QDialog, QFileDialog, QMessageBox, QLineEdit
 
 from ui.edit_dialog_ui import Ui_Dialog as Ui_EditCardDialog
 from ui.edit_catalog_dialog_ui import Ui_Dialog as Ui_EditCatalogDialog
+from utils import dir_scan
 
 
 class EditCardDialog(QDialog):
@@ -39,20 +41,33 @@ class EditCardDialog(QDialog):
                                               'All Files (*)')
         self.validate_not_empty(path, self.ui.linkVideoEdit)
         file_name = os.path.basename(path)
-        shutil.copy(path, os.path.join(self.PATH_VIDEO, file_name))
-        self.ui.linkVideoEdit.setText(self.PATH_VIDEO + file_name)
+        date = datetime.now().date().strftime("%Y-%m-%d")
+        dir_list = dir_scan(self.PATH_VIDEO)
+        video_dir = os.path.join(self.PATH_VIDEO, date)
+        if date not in dir_list:
+            os.makedirs(video_dir)
+        full_path = os.path.join(video_dir, file_name)
+        shutil.copy(path, full_path)
+        self.ui.linkVideoEdit.setText(full_path.replace("\\", "/"))
 
     def add_img_file(self):
         path, _ = QFileDialog.getOpenFileName(self, 'Open Image File', "",
                                               'All Files (*)')
         self.validate_not_empty(path, self.ui.linkImgEdit)
         file_name = os.path.basename(path)
-        shutil.copy(path, os.path.join(self.PATH_IMAGES, file_name))
-        self.ui.linkImgEdit.setText(self.PATH_IMAGES + file_name)
+        date = datetime.now().date().strftime("%Y-%m-%d")
+        dir_list = dir_scan(self.PATH_IMAGES)
+        image_dir = os.path.join(self.PATH_IMAGES, date)
+        if date not in dir_list:
+            os.makedirs(image_dir)
+        full_path = os.path.join(image_dir, file_name)
+        shutil.copy(path, full_path)
+        self.ui.linkImgEdit.setText(full_path.replace("\\", "/"))
 
     def validate_not_empty(self, path: str, edit_field: QLineEdit):
         if not path and not edit_field.text():
             QMessageBox.warning(self, "Выбор файла", "Файл не выбран")
+            return
 
 
 class UpdateCardDialog(EditCardDialog):

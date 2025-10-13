@@ -85,7 +85,7 @@ class EditCardsWindow(QMainWindow):
         data = item.data(QtCore.Qt.ItemDataRole.UserRole)
 
         result = QMessageBox.question(self, "Подтверждение",
-                                      "Точно ли хотите удалить карточку?")
+                                      "Точно хотите удалить карточку?")
 
         if result == QMessageBox.StandardButton.No:
             return
@@ -104,7 +104,7 @@ class EditCardsWindow(QMainWindow):
     def on_buttonEdit_click(self):
         item = self.ui.listWidget.currentItem()
         if not item:
-            msg = QMessageBox.warning(
+            QMessageBox.warning(
                 self,
                 "Редактирование карточки",
                 "Не выбрано ни одной карточки",
