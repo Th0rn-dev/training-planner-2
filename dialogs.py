@@ -38,7 +38,7 @@ class EditCardDialog(QDialog):
 
     def add_video_file(self):
         path, _ = QFileDialog.getOpenFileName(self, 'Open Video File', "",
-                                              'All Files (*)')
+                                              'Media Files (*.mp4 *.mkv *.amv *.m4v *.mov)')
         self.validate_not_empty(path, self.ui.linkVideoEdit)
         file_name = os.path.basename(path)
         date = datetime.now().date().strftime("%Y-%m-%d")
@@ -52,7 +52,7 @@ class EditCardDialog(QDialog):
 
     def add_img_file(self):
         path, _ = QFileDialog.getOpenFileName(self, 'Open Image File', "",
-                                              'All Files (*)')
+                                              'Media Files (*.jpg *.jpeg *.png *.gif)')
         self.validate_not_empty(path, self.ui.linkImgEdit)
         file_name = os.path.basename(path)
         date = datetime.now().date().strftime("%Y-%m-%d")
