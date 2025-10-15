@@ -220,3 +220,6 @@ video/
 .venv/
 .idea
 *.iml
+
+!images/blank.png
+!images/play.png
