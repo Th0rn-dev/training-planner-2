@@ -1,33 +1,31 @@
 CREATE TABLE roles (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) NOT NULL
 );
 
-INSERT INTO roles (name) VALUES ('admin'), ('extended');
-
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
-    role_id INTEGER REFERENCES roles(id)
+    role_id UUID REFERENCES roles(id)
 );
 
 CREATE TABLE categories (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE cards (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(100) NOT NULL,
     preview_image_url VARCHAR(255),
     video_url VARCHAR(255),
-    category_id INTEGER REFERENCES categories(id)
+    category_id UUID REFERENCES categories(id)
 );
 
 CREATE TABLE comments (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    card_id INTEGER REFERENCES cards(id),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    card_id UUID REFERENCES cards(id),
     comment TEXT
 );
