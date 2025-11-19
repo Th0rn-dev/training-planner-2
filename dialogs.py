@@ -67,7 +67,6 @@ class EditCardDialog(QDialog):
     def validate_not_empty(self, path: str, edit_field: QLineEdit):
         if not path and not edit_field.text():
             QMessageBox.warning(self, "Выбор файла", "Файл не выбран")
-            return
 
 
 class UpdateCardDialog(EditCardDialog):
@@ -101,7 +100,7 @@ class UpdateCatalogDialog(EditCatalogDialog):
 
     def __init__(self, init_data, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        category_name = init_data[1]
+        category_name = init_data.name
         self.ui.addButton.setText("Изменить")
         self.ui.titleEdit.setText(category_name)
 

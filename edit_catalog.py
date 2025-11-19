@@ -1,7 +1,8 @@
 from PySide6 import QtCore
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QListWidgetItem
-from sqlalchemy import text
+from sqlalchemy import select, insert, update
 
+from models import Category
 from ui.edit_catalog_ui import Ui_MainWindow
 from session import session
 from dialogs import EditCatalogDialog, UpdateCatalogDialog
@@ -26,11 +27,9 @@ class EditCatalogWindow(QMainWindow):
         self.ui.listWidget.clear()
         self.categories = {}
         with session as s:
-            query = """
-                SELECT *
-                FROM categories
-            """
-            rows = s.execute(text(query))
+            query = select(Category)
+            result = s.execute(query)
+            rows = result.scalars().all()
             for r in rows:
                 self.categories[r.id] = r
 
@@ -54,31 +53,23 @@ class EditCatalogWindow(QMainWindow):
         data = dialog.get_data()
 
         with session as s:
-            query = """
-            INSERT INTO categories(name)
-            VALUES (:name)
-            """
-            s.execute(text(query), {"name": data["name"]})
+            query = insert(Category).values(name = data["name"])
+            s.execute(query)
             s.commit()
         self.load_catalog()
 
     def on_buttonRemove_click(self):
         item = self.ui.listWidget.currentItem()
         data = item.data(QtCore.Qt.ItemDataRole.UserRole)
-
-        result = QMessageBox.question(self, "Подтверждение",
-                                      "Точно ли хотите удалить пункт категории?")
+        result = (QMessageBox
+                  .question(self, "Подтверждение",
+                            "Точно ли хотите удалить пункт категории?"))
 
         if result == QMessageBox.StandardButton.No:
             return
 
         with session as s:
-            query = """
-                DELETE 
-                FROM categories
-                WHERE id = :id
-            """
-            s.execute(text(query), {"id": data[0]})
+            session.delete(data)
             s.commit()
 
         self.load_catalog()
@@ -86,7 +77,7 @@ class EditCatalogWindow(QMainWindow):
     def on_buttonEdit_click(self):
         item = self.ui.listWidget.currentItem()
         if not item:
-            msg = QMessageBox.warning(
+            QMessageBox.warning(
                 self,
                 "Редактирование карточки",
                 "Не выбрано ни одной карточки",
@@ -100,18 +91,12 @@ class EditCatalogWindow(QMainWindow):
             return
         data = dialog.get_data()
 
-        with session as s:
-            query = """
-                UPDATE categories
-                SET name = :name
-                WHERE id= :id
-            """
-            s.execute(text(query), {
-                "id": init_data[0],
-                "name": data["name"]
-            })
+        with (session as s):
+            query = update(Category).where(Category.id.in_([init_data.id])).values(name=data["name"])
+            s.execute(query)
             s.commit()
         self.load_catalog()
+
 
 if __name__ == '__main__':
     print("Edit catalog")
