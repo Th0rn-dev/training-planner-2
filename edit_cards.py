@@ -1,8 +1,9 @@
 from PySide6 import QtCore
 from PySide6.QtWidgets import QMainWindow, QListWidgetItem, \
     QMessageBox
-from sqlalchemy import text
+from sqlalchemy import text, select, update, insert
 
+from models import Card, Category
 from ui.edit_ui import Ui_MainWindow
 from dialogs import EditCardDialog, UpdateCardDialog
 from session import session
@@ -28,12 +29,9 @@ class EditCardsWindow(QMainWindow):
         self.ui.listWidget.clear()
 
         with session as s:
-            query = """
-                 SELECT * 
-                 FROM cards
-                 WHERE category_id = :c_id
-            """
-            rows = s.execute(text(query), {"c_id": category_id})
+            query = select(Card).where(Card.category_id == category_id)
+            result = s.execute(query)
+            rows = result.scalars().all()
             for r in rows:
                 category_name = self.categories[r.category_id].name
                 item = QListWidgetItem(
@@ -46,11 +44,10 @@ class EditCardsWindow(QMainWindow):
         self.ui.comboBox.clear()
         self.categories = {}
         with session as s:
-            query = """
-                SELECT *
-                FROM categories
-            """
-            rows = s.execute(text(query))
+            #ToDo повторяющееся выборка категорий
+            query = select(Category)
+            result = s.execute(query)
+            rows = result.scalars().all()
             for r in rows:
                 self.categories[r.id] = r
 
@@ -66,23 +63,14 @@ class EditCardsWindow(QMainWindow):
         data = dialog.get_data()
 
         with session as s:
-            query = """
-            INSERT INTO cards(title, preview_image_url, video_url, category_id)
-            VALUES (:title, :preview_image_url, :video_url, :category_id)
-            """
-            s.execute(text(query),
-                      {
-                          "title": data["title"],
-                          "preview_image_url": data["preview_image_url"],
-                          "video_url": data["video_url"],
-                          "category_id": data["category_id"]
-                      })
+            query = insert(Card)
+            s.execute(query, data)
             s.commit()
         self.load_cards()
 
     def on_buttonRemove_click(self):
         item = self.ui.listWidget.currentItem()
-        data = item.data(QtCore.Qt.ItemDataRole.UserRole)
+        card = item.data(QtCore.Qt.ItemDataRole.UserRole)
 
         result = QMessageBox.question(self, "Подтверждение",
                                       "Точно хотите удалить карточку?")
@@ -91,12 +79,7 @@ class EditCardsWindow(QMainWindow):
             return
 
         with session as s:
-            query = """
-                DELETE 
-                FROM cards 
-                WHERE id = :id
-            """
-            s.execute(text(query), {"id": data.id})
+            s.delete(card)
             s.commit()
 
         self.load_cards()
@@ -118,19 +101,8 @@ class EditCardsWindow(QMainWindow):
             return
         data = dialog.get_data()
         with session as s:
-            query = """
-                UPDATE cards
-                SET title = :title, preview_image_url = :preview_image_url, video_url = :video_url, category_id = :category_id
-                WHERE id= :id
-            """
-            s.execute(text(query), {
-                "id": init_data.id,
-                "title": data["title"],
-                "preview_image_url": data["preview_image_url"],
-                "video_url": data["video_url"],
-                "category_id": data["category_id"]
-
-            })
+            query = update(Card).where(Card.id.in_([init_data.id]))
+            s.execute(query, data)
             s.commit()
         self.load_cards()
 

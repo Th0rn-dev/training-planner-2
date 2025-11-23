@@ -91,9 +91,9 @@ class EditCatalogWindow(QMainWindow):
             return
         data = dialog.get_data()
 
-        with (session as s):
-            query = update(Category).where(Category.id.in_([init_data.id])).values(name=data["name"])
-            s.execute(query)
+        with session as s:
+            query = update(Category).where(Category.id.in_([init_data.id]))
+            s.execute(query, data)
             s.commit()
         self.load_catalog()
 
