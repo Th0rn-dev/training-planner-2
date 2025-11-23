@@ -53,8 +53,8 @@ class EditCatalogWindow(QMainWindow):
         data = dialog.get_data()
 
         with session as s:
-            query = insert(Category).values(name = data["name"])
-            s.execute(query)
+            query = insert(Category)
+            s.execute(query, data)
             s.commit()
         self.load_catalog()
 
