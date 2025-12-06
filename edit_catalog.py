@@ -52,7 +52,6 @@ class EditCatalogWindow(QMainWindow):
 
     def __init__(self):
         super(EditCatalogWindow, self).__init__()
-        self.categories = {}
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
