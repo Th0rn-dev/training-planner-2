@@ -53,20 +53,17 @@ class EditCatalogWindow(QMainWindow):
     def __init__(self):
         super(EditCatalogWindow, self).__init__()
         self.categories = {}
+        self.rows = []
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
         self.model = ItemsModel()
         self.ui.tableView.setModel(self.model)
         self.ui.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.tableView.horizontalHeader().setStretchLastSection(True)
-
         self.ui.buttonAdd.clicked.connect(self.on_buttonAdd_click)
         self.ui.buttonRemove.clicked.connect(self.on_buttonRemove_click)
         self.ui.buttonEdit.clicked.connect(self.on_buttonEdit_click)
         self.ui.buttonExit.clicked.connect(self.on_buttonExit_click)
-        self.rows = []
-
         self.load_catalog()
 
     def load_catalog(self):
