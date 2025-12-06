@@ -1,4 +1,4 @@
-from PySide6 import QtCore
+from PySide6 import QtCore, QtWidgets
 from PySide6.QtWidgets import QMainWindow, QListWidgetItem, \
     QMessageBox
 from sqlalchemy import select, update, insert
@@ -9,13 +9,64 @@ from dialogs import EditCardDialog, UpdateCardDialog
 from session import session
 
 
+class ItemsModel(QtCore.QAbstractTableModel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.items = []
+
+    def setItems(self, items):
+        self.beginResetModel()
+        self.items = items
+        self.endResetModel()
+
+    def rowCount(self, *args, **kwargs) -> int:
+        return len(self.items)
+
+    def columnCount(self, *args, **kwargs) -> int:
+        return 4
+
+    def data(self, index: QtCore.QModelIndex, role: QtCore.Qt.ItemDataRole):
+        if not index.isValid():
+            return
+
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            info = self.items[index.row()]
+            col = index.column()
+            if col == 0:
+                return f"{index.row() + 1}"
+            if col == 1:
+                return f"{info.title}"
+            if col == 2:
+                return f"{info.preview_image_url}"
+            if col == 3:
+                return f"{info.video_url}"
+        return None
+
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation,
+                   role: QtCore.Qt.ItemDataRole):
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            if orientation == QtCore.Qt.Orientation.Horizontal:
+                return {
+                    0: "Номер",
+                    1: "Название",
+                    2: "Ссылка не превью",
+                    3: "Ссылка на видео",
+                }.get(section)
+
+
 class EditCardsWindow(QMainWindow):
     exitButtonClicked = QtCore.Signal()
 
     def __init__(self):
         super(EditCardsWindow, self).__init__()
+        self.categories = {}
+        self.rows = []
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.model = ItemsModel()
+        self.ui.tableView.setModel(self.model)
+        self.ui.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.ui.tableView.horizontalHeader().setStretchLastSection(True)
         self.load_catalog()
         self.load_cards()
         self.ui.comboBox.currentIndexChanged.connect(self.load_cards)
@@ -25,26 +76,21 @@ class EditCardsWindow(QMainWindow):
         self.ui.buttonExit.clicked.connect(self.on_buttonExit_click)
 
     def load_cards(self):
+        self.ui.tableView.model().items.clear()
         category_id = self.ui.comboBox.currentData().id
-        self.ui.listWidget.clear()
-
         with session as s:
             query = select(Card).where(Card.category_id == category_id)
             result = s.execute(query)
             rows = result.scalars().all()
             for r in rows:
-                category_name = self.categories[r.category_id].name
-                item = QListWidgetItem(
-                    f"{r.id}  {r.title}  {r.preview_image_url or 'empty'} "
-                    f"{r.video_url} {category_name}")
-                item.setData(QtCore.Qt.ItemDataRole.UserRole, r)
-                self.ui.listWidget.addItem(item)
+                self.rows.append(r)
+            self.model.setItems(self.rows)
 
     def load_catalog(self):
         self.ui.comboBox.clear()
         self.categories = {}
         with session as s:
-            #ToDo повторяющееся выборка категорий
+            # ToDo повторяющееся выборка категорий
             query = select(Category)
             result = s.execute(query)
             rows = result.scalars().all()

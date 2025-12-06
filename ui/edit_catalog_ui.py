@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QListWidget, QListWidgetItem, QMainWindow,
-    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+from PySide6.QtWidgets import (QApplication, QHeaderView, QMainWindow, QMenuBar,
+    QPushButton, QSizePolicy, QStatusBar, QTableView,
     QWidget)
 
 class Ui_MainWindow(object):
@@ -29,9 +29,6 @@ class Ui_MainWindow(object):
         self.buttonEdit = QPushButton(self.centralwidget)
         self.buttonEdit.setObjectName(u"buttonEdit")
         self.buttonEdit.setGeometry(QRect(379, 20, 174, 24))
-        self.listWidget = QListWidget(self.centralwidget)
-        self.listWidget.setObjectName(u"listWidget")
-        self.listWidget.setGeometry(QRect(20, 78, 591, 559))
         self.buttonExit = QPushButton(self.centralwidget)
         self.buttonExit.setObjectName(u"buttonExit")
         self.buttonExit.setGeometry(QRect(440, 650, 173, 24))
@@ -41,6 +38,9 @@ class Ui_MainWindow(object):
         self.buttonRemove = QPushButton(self.centralwidget)
         self.buttonRemove.setObjectName(u"buttonRemove")
         self.buttonRemove.setGeometry(QRect(200, 20, 173, 24))
+        self.tableView = QTableView(self.centralwidget)
+        self.tableView.setObjectName(u"tableView")
+        self.tableView.setGeometry(QRect(20, 70, 591, 561))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
@@ -58,7 +58,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.buttonEdit.setText(QCoreApplication.translate("MainWindow", u"\u0420\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c", None))
-        self.buttonExit.setText(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0439\u0442\u0438", None))
+        self.buttonExit.setText(QCoreApplication.translate("MainWindow", u"\u0417\u0430\u043a\u0440\u044b\u0442\u044c", None))
         self.buttonAdd.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c", None))
         self.buttonRemove.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c", None))
     # retranslateUi

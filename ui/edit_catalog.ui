@@ -27,16 +27,6 @@
      <string>Редактировать</string>
     </property>
    </widget>
-   <widget class="QListWidget" name="listWidget">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>78</y>
-      <width>591</width>
-      <height>559</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="buttonExit">
     <property name="geometry">
      <rect>
@@ -47,7 +37,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Выйти</string>
+     <string>Закрыть</string>
     </property>
    </widget>
    <widget class="QPushButton" name="buttonAdd">
@@ -74,6 +64,16 @@
     </property>
     <property name="text">
      <string>Удалить</string>
+    </property>
+   </widget>
+   <widget class="QTableView" name="tableView">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>591</width>
+      <height>561</height>
+     </rect>
     </property>
    </widget>
   </widget>
