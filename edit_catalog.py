@@ -1,5 +1,5 @@
 from PySide6 import QtCore
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QListWidgetItem
+from PySide6.QtWidgets import QMainWindow, QMessageBox
 from PySide6 import QtWidgets
 from sqlalchemy import select, insert, update
 
@@ -33,7 +33,7 @@ class ItemsModel(QtCore.QAbstractTableModel):
             info = self.items[index.row()]
             col = index.column()
             if col == 0:
-                return f"{info.id}"
+                return f"{index.row() + 1}"
             if col == 1:
                 return f"{info.name}"
 
@@ -59,6 +59,7 @@ class EditCatalogWindow(QMainWindow):
         self.model = ItemsModel()
         self.ui.tableView.setModel(self.model)
         self.ui.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.ui.tableView.horizontalHeader().setStretchLastSection(True)
 
         self.ui.buttonAdd.clicked.connect(self.on_buttonAdd_click)
         self.ui.buttonRemove.clicked.connect(self.on_buttonRemove_click)
@@ -69,7 +70,7 @@ class EditCatalogWindow(QMainWindow):
         self.load_catalog()
 
     def load_catalog(self):
-        # self.ui.listWidget.clear()
+        self.ui.tableView.model().items.clear()
         self.categories = {}
         with session as s:
             query = select(Category)
@@ -79,10 +80,6 @@ class EditCatalogWindow(QMainWindow):
                 self.categories[r.id] = r
 
         for category in self.categories.values():
-            # item = QListWidgetItem()
-            # item.setText(category.name)
-            # item.setData(QtCore.Qt.ItemDataRole.UserRole, category)
-            # self.ui.listWidget.addItem(item)
             self.rows.append(category)
         self.model.setItems(self.rows)
 
