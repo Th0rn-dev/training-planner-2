@@ -1,11 +1,50 @@
 from PySide6 import QtCore
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QListWidgetItem
+from PySide6 import QtWidgets
 from sqlalchemy import select, insert, update
 
 from models import Category
 from ui.edit_catalog_ui import Ui_MainWindow
 from session import session
 from dialogs import EditCatalogDialog, UpdateCatalogDialog
+
+
+class ItemsModel(QtCore.QAbstractTableModel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.items = []
+
+    def setItems(self, items):
+        self.beginResetModel()
+        self.items = items
+        self.endResetModel()
+
+    def rowCount(self, *args, **kwargs) -> int:
+        return len(self.items)
+
+    def columnCount(self, *args, **kwargs) -> int:
+        return 2
+
+    def data(self, index: QtCore.QModelIndex, role: QtCore.Qt.ItemDataRole):
+        if not index.isValid():
+            return
+
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            info = self.items[index.row()]
+            col = index.column()
+            if col == 0:
+                return f"{info.id}"
+            if col == 1:
+                return f"{info.name}"
+
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation,
+                   role: QtCore.Qt.ItemDataRole):
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            if orientation == QtCore.Qt.Orientation.Horizontal:
+                return {
+                    0: "Id",
+                    1: "Название категории"
+                }.get(section)
 
 
 class EditCatalogWindow(QMainWindow):
@@ -16,15 +55,21 @@ class EditCatalogWindow(QMainWindow):
         self.categories = {}
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.model = ItemsModel()
+        self.ui.tableView.setModel(self.model)
+        self.ui.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+
         self.ui.buttonAdd.clicked.connect(self.on_buttonAdd_click)
         self.ui.buttonRemove.clicked.connect(self.on_buttonRemove_click)
         self.ui.buttonEdit.clicked.connect(self.on_buttonEdit_click)
         self.ui.buttonExit.clicked.connect(self.on_buttonExit_click)
+        self.rows = []
 
         self.load_catalog()
 
     def load_catalog(self):
-        self.ui.listWidget.clear()
+        # self.ui.listWidget.clear()
         self.categories = {}
         with session as s:
             query = select(Category)
@@ -34,10 +79,12 @@ class EditCatalogWindow(QMainWindow):
                 self.categories[r.id] = r
 
         for category in self.categories.values():
-            item = QListWidgetItem()
-            item.setText(category.name)
-            item.setData(QtCore.Qt.ItemDataRole.UserRole, category)
-            self.ui.listWidget.addItem(item)
+            # item = QListWidgetItem()
+            # item.setText(category.name)
+            # item.setData(QtCore.Qt.ItemDataRole.UserRole, category)
+            # self.ui.listWidget.addItem(item)
+            self.rows.append(category)
+        self.model.setItems(self.rows)
 
     def on_buttonExit_click(self):
         # пульнуть главному окну сигнал обновить контент
