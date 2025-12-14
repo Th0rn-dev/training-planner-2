@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, Signal
-from PySide6.QtWidgets import QMainWindow, QMessageBox
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QAbstractItemView
 from PySide6 import QtWidgets
 from sqlalchemy import select, insert, update
 
@@ -76,6 +76,7 @@ class EditCatalogWindow(QMainWindow):
         self.ui.tableView.setModel(self.model)
         self.ui.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.tableView.horizontalHeader().setStretchLastSection(True)
+        self.ui.tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui.buttonAdd.clicked.connect(self.on_buttonAdd_click)
         self.ui.buttonRemove.clicked.connect(self.on_buttonRemove_click)
         self.ui.buttonEdit.clicked.connect(self.on_buttonEdit_click)
