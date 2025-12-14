@@ -1,5 +1,5 @@
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtWidgets import QMainWindow, QListWidgetItem, \
+from PySide6.QtWidgets import QMainWindow, \
     QMessageBox
 from sqlalchemy import select, update, insert
 
@@ -13,6 +13,7 @@ class ItemsModel(QtCore.QAbstractTableModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.items = []
+        self.headers = ["Номер", "Название", "Ссылка не превью", "Ссылка на видео"]
 
     def setItems(self, items):
         self.beginResetModel()
@@ -23,11 +24,11 @@ class ItemsModel(QtCore.QAbstractTableModel):
         return len(self.items)
 
     def columnCount(self, *args, **kwargs) -> int:
-        return 4
+        return len(self.headers)
 
     def data(self, index: QtCore.QModelIndex, role: QtCore.Qt.ItemDataRole):
         if not index.isValid():
-            return
+            return None
 
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             info = self.items[index.row()]
@@ -37,21 +38,15 @@ class ItemsModel(QtCore.QAbstractTableModel):
             if col == 1:
                 return f"{info.title}"
             if col == 2:
-                return f"{info.preview_image_url}"
+                return f"{info.preview_image_url}" or "empty"
             if col == 3:
                 return f"{info.video_url}"
         return None
 
-    def headerData(self, section: int, orientation: QtCore.Qt.Orientation,
-                   role: QtCore.Qt.ItemDataRole):
-        if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            if orientation == QtCore.Qt.Orientation.Horizontal:
-                return {
-                    0: "Номер",
-                    1: "Название",
-                    2: "Ссылка не превью",
-                    3: "Ссылка на видео",
-                }.get(section)
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole):
+        if orientation == QtCore.Qt.Orientation.Horizontal and role == QtCore.Qt.ItemDataRole.DisplayRole:
+            return self.headers[section]
+        return None
 
 
 class EditCardsWindow(QMainWindow):
