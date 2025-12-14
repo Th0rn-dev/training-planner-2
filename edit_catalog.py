@@ -57,11 +57,6 @@ class ItemsModel(QAbstractTableModel):
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
 
 
-    def getItem(self, row) -> Category:
-        if 0 <= row < len(self.items):
-            return self.items[row]
-        return None
-
     def removeRows(self, row):
         if 0 <= row < len(self.items):
             self.items.pop(row)
@@ -144,8 +139,9 @@ class EditCatalogWindow(QMainWindow):
         self.load_catalog()
 
     def on_buttonEdit_click(self):
-        item = self.ui.listWidget.currentItem()
-        if not item:
+        selected = self.ui.tableView.selectedIndexes()
+
+        if not selected:
             QMessageBox.warning(
                 self,
                 "Редактирование карточки",
@@ -153,15 +149,20 @@ class EditCatalogWindow(QMainWindow):
                 QMessageBox.StandardButton.Yes
             )
             return
-        init_data = item.data(Qt.ItemDataRole.UserRole)
-        dialog = UpdateCatalogDialog(init_data)
+
+        row = selected[0].row()
+        item = self.ui.tableView.model().items[row]
+        if not item:
+            return
+
+        dialog = UpdateCatalogDialog(item)
         result = dialog.exec()
         if result == 0:
             return
-        data = dialog.get_data()
 
+        data = dialog.get_data()
         with session as s:
-            query = update(Category).where(Category.id.in_([init_data.id]))
+            query = update(Category).where(Category.id.in_([item.id]))
             s.execute(query, data)
             s.commit()
         self.load_catalog()
