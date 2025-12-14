@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt, QModelIndex, QAbstractTableModel, Signal
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QMainWindow, \
-    QMessageBox
+    QMessageBox, QAbstractItemView
 from sqlalchemy import select, update, insert
 
 from models import Card, Category
@@ -87,6 +87,7 @@ class EditCardsWindow(QMainWindow):
         self.ui.tableView.setModel(self.model)
         self.ui.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.tableView.horizontalHeader().setStretchLastSection(True)
+        self.ui.tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.load_catalog()
         self.load_cards()
         self.ui.comboBox.currentIndexChanged.connect(self.load_cards)
