@@ -1,4 +1,4 @@
-from PySide6 import QtCore
+from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, Signal
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from PySide6 import QtWidgets
 from sqlalchemy import select, insert, update
@@ -9,10 +9,11 @@ from session import session
 from dialogs import EditCatalogDialog, UpdateCatalogDialog
 
 
-class ItemsModel(QtCore.QAbstractTableModel):
+class ItemsModel(QAbstractTableModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.items = []
+        self.headers = ["Номер", "Название категории"]
 
     def setItems(self, items):
         self.beginResetModel()
@@ -23,13 +24,13 @@ class ItemsModel(QtCore.QAbstractTableModel):
         return len(self.items)
 
     def columnCount(self, *args, **kwargs) -> int:
-        return 2
+        return len(self.headers)
 
-    def data(self, index: QtCore.QModelIndex, role: QtCore.Qt.ItemDataRole):
+    def data(self, index: QModelIndex, role: Qt.ItemDataRole):
         if not index.isValid():
-            return
+            return None
 
-        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             info = self.items[index.row()]
             col = index.column()
             if col == 0:
@@ -37,18 +38,38 @@ class ItemsModel(QtCore.QAbstractTableModel):
             if col == 1:
                 return f"{info.name}"
 
-    def headerData(self, section: int, orientation: QtCore.Qt.Orientation,
-                   role: QtCore.Qt.ItemDataRole):
-        if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            if orientation == QtCore.Qt.Orientation.Horizontal:
-                return {
-                    0: "Id",
-                    1: "Название категории"
-                }.get(section)
+    def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole):
+        if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
+                return self.headers[section]
+
+    def setData(self, index: QModelIndex, value, role: Qt.ItemDataRole.EditRole):
+        if not index.isValid() and role == Qt.ItemDataRole.EditRole:
+            category = self.items[index.row()]
+            col = index.column()
+            if col == 1:
+                category.name = value
+            return True
+        return False
+
+    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
+        if not index.isValid():
+            return Qt.ItemFlag.NoItemFlags
+        return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
+
+
+    def getItem(self, row) -> Category:
+        if 0 <= row < len(self.items):
+            return self.items[row]
+        return None
+
+    def removeRows(self, row):
+        if 0 <= row < len(self.items):
+            self.items.pop(row)
+            self.layoutChanged.emit()
 
 
 class EditCatalogWindow(QMainWindow):
-    exitButtonClicked = QtCore.Signal()
+    exitButtonClicked = Signal()
 
     def __init__(self):
         super(EditCatalogWindow, self).__init__()
@@ -100,19 +121,26 @@ class EditCatalogWindow(QMainWindow):
         self.load_catalog()
 
     def on_buttonRemove_click(self):
-        item = self.ui.listWidget.currentItem()
-        data = item.data(QtCore.Qt.ItemDataRole.UserRole)
+        selected = self.ui.tableView.selectedIndexes()
+        if not selected:
+            QMessageBox.warning(self, "Ошибка", "Выберите категорию для удаления!")
+            return
+
+        row = selected[0].row()
+        category_id = self.ui.tableView.model().items[row].id
+        if not category_id:
+            return
+
         result = (QMessageBox
                   .question(self, "Подтверждение",
                             "Точно ли хотите удалить пункт категории?"))
-
         if result == QMessageBox.StandardButton.No:
             return
 
         with session as s:
-            session.delete(data)
+            category = self.categories[category_id]
+            s.delete(category)
             s.commit()
-
         self.load_catalog()
 
     def on_buttonEdit_click(self):
@@ -125,7 +153,7 @@ class EditCatalogWindow(QMainWindow):
                 QMessageBox.StandardButton.Yes
             )
             return
-        init_data = item.data(QtCore.Qt.ItemDataRole.UserRole)
+        init_data = item.data(Qt.ItemDataRole.UserRole)
         dialog = UpdateCatalogDialog(init_data)
         result = dialog.exec()
         if result == 0:
