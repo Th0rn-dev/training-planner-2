@@ -1,7 +1,5 @@
-import os
 import sys
 
-from PySide6 import QtCore
 from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, \
     QPushButton, QLabel, QGridLayout, QScrollArea, QListWidget, QMenu, \
     QMenuBar, QListWidgetItem
@@ -64,7 +62,7 @@ class MainWindow(QWidget):
         if not current_row:
             category_id = session.query(Category).first().id
         else:
-            data = current_row.data(QtCore.Qt.DisplayRole)
+            data = current_row.data(Qt.DisplayRole)
             for key in self.categories.keys():
                 if data in self.categories[key]:
                     category_id = key
@@ -107,7 +105,7 @@ class MainWindow(QWidget):
         for category in categories:
             self.categories[category.id] = category.name
             item = QListWidgetItem(f"{category.name}")
-            item.setData(QtCore.Qt.ItemDataRole.UserRole, category)
+            item.setData(Qt.ItemDataRole.UserRole, category)
             self.category.addItem(item)
 
 
