@@ -11,15 +11,18 @@ CREATE TABLE users (
 );
 
 CREATE TABLE categories (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL
+	id uuid DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar(100) NOT NULL,
+	parent_id uuid NULL,
+	CONSTRAINT categories_pkey PRIMARY KEY (id),
+	CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES categories(id)
 );
 
 CREATE TABLE cards (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(100) NOT NULL,
     preview_image_url VARCHAR(255),
-    video_url VARCHAR(255),
+    video_url VARCHAR(255) NOT NULL,
     category_id UUID REFERENCES categories(id)
 );
 
