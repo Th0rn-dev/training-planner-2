@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import String, ForeignKey, Text
+from sqlalchemy import String, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
@@ -45,6 +45,7 @@ class Card(Base):
     preview_image_url: Mapped[str] = mapped_column(String(255), nullable=True)
     video_url: Mapped[str] = mapped_column(String(255), nullable=True)
     category_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("categories.id"))
+    invisible: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     category = relationship("Category", backref="cards")
 
     def __repr__(self):
