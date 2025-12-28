@@ -152,13 +152,14 @@ class MainWindow(QWidget):
 
     def load_cards(self):
         current_index = self.category.currentIndex()
+        print(current_index)
         if current_index.isValid():
             category_id = current_index.internalPointer().id
         else:
-            category_id = session.query(Category).all()[0].id
+            category_id = session.query(Category).first().id
 
         self.clear_layout(self.grid_layout)
-        cards = session.query(Card).filter(Card.category_id == category_id).all()
+        cards = session.query(Card).filter(Card.category_id == category_id, Card.invisible != True).all()
         row = 0
         col = 0
         for card in cards:

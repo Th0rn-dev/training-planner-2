@@ -1,6 +1,17 @@
-INSERT INTO public.categories ("name") VALUES('Соуфа');
-INSERT INTO public.categories ("name") VALUES('Формы');
-INSERT INTO public.categories ("name") VALUES('Чисао');
+DELETE FROM comments;
+DELETE FROM cards;
+DELETE FROM categories;
 
-INSERT INTO public.cards (title, category_id)
-VALUES('Название карточки', (select id from categories limit 1 ));
+INSERT INTO categories ("name")
+VALUES ('Category 1');
+INSERT INTO categories ("name")
+VALUES ('Category 2');
+INSERT INTO categories ("name")
+VALUES ('Category 3');
+INSERT INTO categories ("name", parent_id)
+VALUES ('Subcategory', (select id from categories limit 1) );
+
+INSERT INTO cards (title, video_url, category_id, invisible)
+VALUES ('Card in Subcategory', '_', (select c.id
+                                from categories as c
+                                where c.name like 'Subc%'), false);

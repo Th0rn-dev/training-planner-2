@@ -23,6 +23,7 @@ CREATE TABLE cards (
     title VARCHAR(100) NOT NULL,
     preview_image_url VARCHAR(255),
     video_url VARCHAR(255) NOT NULL,
+    invisible bool DEFAULT false NOT NULL,
     category_id UUID REFERENCES categories(id)
 );
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>461</width>
-    <height>328</height>
+    <width>460</width>
+    <height>330</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>57</width>
+     <width>80</width>
      <height>16</height>
     </rect>
    </property>
@@ -29,10 +29,10 @@
   <widget class="QComboBox" name="cmbCategory">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>55</y>
-     <width>69</width>
-     <height>22</height>
+     <x>10</x>
+     <y>30</y>
+     <width>200</width>
+     <height>20</height>
     </rect>
    </property>
   </widget>
@@ -40,8 +40,8 @@
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>83</y>
-     <width>53</width>
+     <y>120</y>
+     <width>71</width>
      <height>16</height>
     </rect>
    </property>
@@ -53,7 +53,7 @@
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>110</y>
+     <y>140</y>
      <width>439</width>
      <height>21</height>
     </rect>
@@ -63,8 +63,8 @@
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>157</y>
-     <width>44</width>
+     <y>170</y>
+     <width>60</width>
      <height>16</height>
     </rect>
    </property>
@@ -76,8 +76,8 @@
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>180</y>
-     <width>371</width>
+     <y>190</y>
+     <width>350</width>
      <height>21</height>
     </rect>
    </property>
@@ -87,7 +87,7 @@
     <rect>
      <x>9</x>
      <y>220</y>
-     <width>93</width>
+     <width>120</width>
      <height>16</height>
     </rect>
    </property>
@@ -100,7 +100,7 @@
     <rect>
      <x>9</x>
      <y>240</y>
-     <width>371</width>
+     <width>350</width>
      <height>21</height>
     </rect>
    </property>
@@ -109,20 +109,20 @@
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>280</y>
+     <y>290</y>
      <width>75</width>
      <height>24</height>
     </rect>
    </property>
    <property name="text">
-    <string>Добавить</string>
+    <string>Сохранить</string>
    </property>
   </widget>
   <widget class="QPushButton" name="cancelButton">
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>280</y>
+     <y>290</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -134,27 +134,53 @@
   <widget class="QPushButton" name="addVideoButton">
    <property name="geometry">
     <rect>
-     <x>390</x>
+     <x>370</x>
      <y>240</y>
-     <width>51</width>
+     <width>75</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Video</string>
+    <string>Добавить</string>
    </property>
   </widget>
   <widget class="QPushButton" name="addImageButton">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>180</y>
-     <width>51</width>
+     <x>370</x>
+     <y>190</y>
+     <width>75</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Image</string>
+    <string>Добавить</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>80</y>
+     <width>127</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>не отображать</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>160</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Видомость в каталоге</string>
    </property>
   </widget>
  </widget>
