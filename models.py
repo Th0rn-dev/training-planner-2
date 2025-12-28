@@ -43,9 +43,9 @@ class Card(Base):
     id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
     preview_image_url: Mapped[str] = mapped_column(String(255), nullable=True)
-    video_url: Mapped[str] = mapped_column(String(255), nullable=True)
+    video_url: Mapped[str] = mapped_column(String(255), nullable=False)
     category_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("categories.id"))
-    invisible: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
+    invisible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     category = relationship("Category", backref="cards")
 
     def __repr__(self):
