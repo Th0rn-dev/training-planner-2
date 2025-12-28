@@ -14,7 +14,7 @@ class ItemsModel(QAbstractTableModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.items = []
-        self.headers = ["Номер", "Название", "Ссылка не превью", "Ссылка на видео"]
+        self.headers = ["Номер", "Название", "Ссылка не превью", "Ссылка на видео", "Скрыть"]
 
     def setItems(self, items):
         self.beginResetModel()
@@ -42,6 +42,8 @@ class ItemsModel(QAbstractTableModel):
                 return f"{info.preview_image_url}" or "empty"
             if col == 3:
                 return f"{info.video_url}"
+            if col == 4:
+                return f"{info.invisible}" or "empty"
         return None
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole):
@@ -64,6 +66,8 @@ class ItemsModel(QAbstractTableModel):
                 card.preview_image_url = value
             if col == 3:
                 card.video_url = value
+            if col == 4:
+                card.invisible = value
             self.dataChanged.emit(index, index)
             return True
         return False
@@ -97,15 +101,15 @@ class EditCardsWindow(QMainWindow):
         self.ui.buttonExit.clicked.connect(self.on_buttonExit_click)
 
     def load_cards(self):
+        rows = None
         self.ui.tableView.model().items.clear()
         category_id = self.ui.comboBox.currentData().id
         with session as s:
             query = select(Card).where(Card.category_id == category_id)
-            result = s.execute(query)
-            rows = result.scalars().all()
-            for r in rows:
-                self.rows.append(r)
-            self.model.setItems(self.rows)
+            rows = s.scalars(query).all()
+        for r in rows:
+            self.rows.append(r)
+        self.model.setItems(self.rows)
 
     def load_catalog(self):
         self.ui.comboBox.clear()

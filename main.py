@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, \
     QMenuBar, QTreeView
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtCore import Qt, QSize, QAbstractItemModel, QModelIndex
+from sqlalchemy import select, and_
 
 from edit_cards import EditCardsWindow
 from edit_catalog import EditCatalogWindow
@@ -152,13 +153,20 @@ class MainWindow(QWidget):
 
     def load_cards(self):
         current_index = self.category.currentIndex()
+        print(current_index)
         if current_index.isValid():
             category_id = current_index.internalPointer().id
         else:
-            category_id = session.query(Category).all()[0].id
+            category_id = session.query(Category).first().id
 
         self.clear_layout(self.grid_layout)
-        cards = session.query(Card).filter(Card.category_id == category_id).all()
+        cards = None
+        with session as s:
+            query = select(Card).where(
+                and_(
+                    Card.category_id == category_id,
+                    Card.invisible != True))
+            cards = s.scalars(query).all()
         row = 0
         col = 0
         for card in cards:
@@ -189,15 +197,17 @@ class MainWindow(QWidget):
 
     def load_categories(self):
         self.categories = {}
-        categories = session.query(Category).all()
-        root_categories = [cat for cat in categories if cat.parent_id is None]
-        for category in categories:
-            self.categories[category.id] = category.name
-            self._build_children(category, categories)
-        # Обновляем модель
-        self.category_model = CategoryTreeModel(root_categories)
-        self.category.setModel(self.category_model)
-        self.category.expandAll()
+        with session as s:
+            query = select(Category)
+            categories = s.scalars(query).all()
+            root_categories = [cat for cat in categories if cat.parent_id is None]
+            for category in categories:
+                self.categories[category.id] = category.name
+                self._build_children(category, categories)
+            # Обновляем модель
+            self.category_model = CategoryTreeModel(root_categories)
+            self.category.setModel(self.category_model)
+            self.category.expandAll()
 
     def _build_children(self, parent, categories):
         """Рекурсивно собираем все категории"""
