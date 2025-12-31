@@ -13,7 +13,7 @@ class ItemsModel(QAbstractTableModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.items = []
-        self.headers = ["Номер", "Название категории"]
+        self.headers = ["Номер", "Название категории", "Родительская категория"]
 
     def setItems(self, items):
         self.beginResetModel()
@@ -37,6 +37,8 @@ class ItemsModel(QAbstractTableModel):
                 return f"{index.row() + 1}"
             if col == 1:
                 return f"{info.name}"
+            if col == 2:
+                return f"{info.parent.name}"
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole):
         if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
@@ -48,6 +50,8 @@ class ItemsModel(QAbstractTableModel):
             col = index.column()
             if col == 1:
                 category.name = value
+            if col == 2:
+                category.parent = value
             return True
         return False
 
@@ -103,7 +107,7 @@ class EditCatalogWindow(QMainWindow):
         self.close()
 
     def on_buttonAdd_click(self):
-        dialog = EditCatalogDialog()
+        dialog = EditCatalogDialog(self.categories)
         result = dialog.exec()
 
         if result == 0:
@@ -156,7 +160,7 @@ class EditCatalogWindow(QMainWindow):
         if not item:
             return
 
-        dialog = UpdateCatalogDialog(item)
+        dialog = UpdateCatalogDialog(self.categories, item)
         result = dialog.exec()
         if result == 0:
             return
