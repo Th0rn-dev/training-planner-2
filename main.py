@@ -152,7 +152,6 @@ class MainWindow(QWidget):
 
     def load_cards(self):
         current_index = self.category.currentIndex()
-        print(current_index)
         if current_index.isValid():
             category_id = current_index.internalPointer().id
         else:

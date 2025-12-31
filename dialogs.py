@@ -86,25 +86,42 @@ class UpdateCardDialog(EditCardDialog):
 class EditCatalogDialog(QDialog):
     """Диалог добавления категории"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, categories, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.categories = categories
         self.ui = Ui_EditCatalogDialog()
         self.ui.setupUi(self)
         self.ui.addButton.clicked.connect(self.accept)
         self.ui.cancelButton.clicked.connect(self.reject)
+        self.ui.assignParentCategory.addItem("", None)
+        for c in self.categories.values():
+            self.ui.assignParentCategory.addItem(c.name, c)
 
     def get_data(self):
-        return {"name": self.ui.titleEdit.text()}
+        try:
+            parent_id = self.ui.assignParentCategory.currentData().id
+        except AttributeError:
+            parent_id = None
+        return {
+            "name": self.ui.titleEdit.text(),
+            "parent_id": parent_id
+        }
 
 
 class UpdateCatalogDialog(EditCatalogDialog):
     """Диалог изменения категории"""
 
-    def __init__(self, init_data, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, categories, init_data, *args, **kwargs):
+        super().__init__( categories, *args, **kwargs)
         category_name = init_data.name
+        category_parent = init_data.parent_id
+        if category_parent is not None:
+            name = categories[category_parent].name
+        else:
+            name = None
         self.ui.addButton.setText("Изменить")
         self.ui.titleEdit.setText(category_name)
+        self.ui.assignParentCategory.setCurrentText(name)
 
 
 if __name__ == '__main__':

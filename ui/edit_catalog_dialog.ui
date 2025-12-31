@@ -7,17 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>147</height>
+    <height>250</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Добавить категорию</string>
   </property>
   <widget class="QLineEdit" name="titleEdit">
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>50</y>
+     <y>120</y>
      <width>381</width>
      <height>22</height>
     </rect>
@@ -27,20 +27,20 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>90</y>
+     <y>190</y>
      <width>75</width>
      <height>24</height>
     </rect>
    </property>
    <property name="text">
-    <string>Отмена</string>
+    <string>Отменить</string>
    </property>
   </widget>
   <widget class="QPushButton" name="addButton">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>90</y>
+     <x>210</x>
+     <y>190</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -49,17 +49,46 @@
     <string>Добавить</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="labelTitleCategory">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>90</y>
+     <width>72</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Название</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelParentCategory">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>53</width>
-     <height>16</height>
+     <width>175</width>
+     <height>18</height>
     </rect>
    </property>
    <property name="text">
-    <string>Название</string>
+    <string>Родительская категория</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="assignParentCategory">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>381</width>
+     <height>26</height>
+    </rect>
    </property>
   </widget>
  </widget>
