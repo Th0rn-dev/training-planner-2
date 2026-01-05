@@ -54,7 +54,7 @@ class ItemsModel(QAbstractTableModel):
     def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         if not index.isValid():
             return Qt.ItemFlag.NoItemFlags
-        return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
+        return super().flags(index) & ~Qt.ItemFlag.ItemIsEditable
 
     def setData(self, index: QModelIndex, value, role: Qt.ItemDataRole.UserRole):
         if not index.isValid() and role == Qt.ItemDataRole.UserRole:

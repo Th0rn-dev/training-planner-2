@@ -67,7 +67,7 @@ class CategoryTreeModel(QAbstractItemModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.NoItemFlags
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        return super().flags(index) & ~Qt.ItemFlag.ItemIsEditable
 
     def setData(self, index, value, role=Qt.EditRole):
         if index.isValid() and role == Qt.EditRole:

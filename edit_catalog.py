@@ -58,7 +58,7 @@ class ItemsModel(QAbstractTableModel):
     def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         if not index.isValid():
             return Qt.ItemFlag.NoItemFlags
-        return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
+        return super().flags(index) & ~Qt.ItemFlag.ItemIsEditable
 
 
     def removeRows(self, row):
