@@ -35,6 +35,7 @@ class EditCardDialog(QDialog):
             "video_url": self.ui.linkVideoEdit.text(),
             "category_id": self.ui.cmbCategory.currentData().id,
             "invisible": self.ui.checkBox.isChecked(),
+            "description": self.ui.descriptionEdit.toPlainText(),
         }
 
     def add_video_file(self):
@@ -81,6 +82,7 @@ class UpdateCardDialog(EditCardDialog):
         self.ui.linkImgEdit.setText(str(init_data.preview_image_url))
         self.ui.linkVideoEdit.setText(str(init_data.video_url))
         self.ui.checkBox.setChecked(init_data.invisible)
+        self.ui.descriptionEdit.appendPlainText(init_data.description)
 
 
 class EditCatalogDialog(QDialog):

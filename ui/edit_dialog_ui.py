@@ -16,14 +16,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
-    QLabel, QLineEdit, QPushButton, QSizePolicy,
-    QWidget)
+    QLabel, QLineEdit, QPlainTextEdit, QPushButton,
+    QSizePolicy, QWidget)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(460, 330)
+        Dialog.resize(460, 600)
         self.label = QLabel(Dialog)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(9, 9, 80, 16))
@@ -50,10 +50,10 @@ class Ui_Dialog(object):
         self.linkVideoEdit.setGeometry(QRect(9, 240, 350, 21))
         self.addButton = QPushButton(Dialog)
         self.addButton.setObjectName(u"addButton")
-        self.addButton.setGeometry(QRect(280, 290, 75, 24))
+        self.addButton.setGeometry(QRect(280, 560, 75, 24))
         self.cancelButton = QPushButton(Dialog)
         self.cancelButton.setObjectName(u"cancelButton")
-        self.cancelButton.setGeometry(QRect(370, 290, 75, 24))
+        self.cancelButton.setGeometry(QRect(370, 560, 75, 24))
         self.addVideoButton = QPushButton(Dialog)
         self.addVideoButton.setObjectName(u"addVideoButton")
         self.addVideoButton.setGeometry(QRect(370, 240, 75, 21))
@@ -66,6 +66,9 @@ class Ui_Dialog(object):
         self.label_5 = QLabel(Dialog)
         self.label_5.setObjectName(u"label_5")
         self.label_5.setGeometry(QRect(10, 60, 160, 18))
+        self.descriptionEdit = QPlainTextEdit(Dialog)
+        self.descriptionEdit.setObjectName(u"descriptionEdit")
+        self.descriptionEdit.setGeometry(QRect(10, 280, 435, 270))
 
         self.retranslateUi(Dialog)
 

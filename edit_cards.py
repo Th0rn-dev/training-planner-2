@@ -68,6 +68,8 @@ class ItemsModel(QAbstractTableModel):
                 card.video_url = value
             if col == 4:
                 card.invisible = value
+            if col == 5:
+                card.description = value
             self.dataChanged.emit(index, index)
             return True
         return False
