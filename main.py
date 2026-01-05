@@ -170,6 +170,7 @@ class MainWindow(QWidget):
             preview.setPixmap(
                 pixmap.scaled(150, 150, Qt.AspectRatioMode.IgnoreAspectRatio))
             preview.setAlignment(Qt.AlignCenter)
+            preview.setToolTip(card.description)
 
             button = QPushButton()
             button.setIcon(self.play_icon)

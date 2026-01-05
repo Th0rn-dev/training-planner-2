@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>460</width>
-    <height>330</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -109,7 +109,7 @@
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>290</y>
+     <y>560</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -122,7 +122,7 @@
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>290</y>
+     <y>560</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -181,6 +181,16 @@
    </property>
    <property name="text">
     <string>Видомость в каталоге</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="descriptionEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>280</y>
+     <width>435</width>
+     <height>270</height>
+    </rect>
    </property>
   </widget>
  </widget>
