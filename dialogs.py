@@ -2,6 +2,8 @@ import os.path
 import shutil
 from datetime import datetime
 
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QDialog, QFileDialog, QMessageBox, QLineEdit
 
 from ui.edit_dialog_ui import Ui_Dialog as Ui_EditCardDialog
@@ -14,9 +16,11 @@ class EditCardDialog(QDialog):
 
     PATH_VIDEO = "./video/"
     PATH_IMAGES = "./images/"
+    PATH_BLANK_IMG = PATH_IMAGES + "blank.png"
 
     def __init__(self, categories, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.original_image = None
         self.categories = categories
         self.ui = Ui_EditCardDialog()
         self.ui.setupUi(self)
@@ -24,6 +28,7 @@ class EditCardDialog(QDialog):
         self.ui.cancelButton.clicked.connect(self.reject)
         self.ui.addVideoButton.clicked.connect(self.add_video_file)
         self.ui.addImageButton.clicked.connect(self.add_img_file)
+        self.ui.labelForPreview.setPixmap(QPixmap(self.PATH_BLANK_IMG))
 
         for c in self.categories.values():
             self.ui.cmbCategory.addItem(c.name, c)
@@ -57,13 +62,22 @@ class EditCardDialog(QDialog):
                                               'Media Files (*.jpg *.jpeg *.png *.gif)')
         self.validate_not_empty(path, self.ui.linkImgEdit)
         file_name = os.path.basename(path)
+        self.original_image = QPixmap(path)
+        cropped_size = QSize(150, 150)
+        scaled = self.original_image.scaled(
+            cropped_size,
+            Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+            Qt.TransformationMode.SmoothTransformation
+        )
         date = datetime.now().date().strftime("%Y-%m-%d")
         dir_list = dir_scan(self.PATH_IMAGES)
         image_dir = os.path.join(self.PATH_IMAGES, date)
         if date not in dir_list:
             os.makedirs(image_dir)
         full_path = os.path.join(image_dir, file_name)
-        shutil.copy(path, full_path)
+        scaled.save(full_path)
+        self.ui.labelForPreview.setPixmap(scaled)
+        self.ui.labelForPreview.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         self.ui.linkImgEdit.setText(full_path.replace("\\", "/"))
 
     def validate_not_empty(self, path: str, edit_field: QLineEdit):
@@ -83,6 +97,7 @@ class UpdateCardDialog(EditCardDialog):
         self.ui.linkVideoEdit.setText(str(init_data.video_url))
         self.ui.checkBox.setChecked(init_data.invisible)
         self.ui.descriptionEdit.appendPlainText(init_data.description)
+        self.ui.labelForPreview.setPixmap(QPixmap(init_data.preview_image_url or self.PATH_BLANK_IMG))
 
 
 class EditCatalogDialog(QDialog):

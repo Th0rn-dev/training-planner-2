@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 from PySide6.QtCore import Qt, QModelIndex, QAbstractTableModel, Signal
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QMainWindow, \
@@ -103,14 +106,11 @@ class EditCardsWindow(QMainWindow):
         self.ui.buttonExit.clicked.connect(self.on_buttonExit_click)
 
     def load_cards(self):
-        rows = None
         self.ui.tableView.model().items.clear()
         category_id = self.ui.comboBox.currentData().id
         with session as s:
             query = select(Card).where(Card.category_id == category_id)
-            rows = s.scalars(query).all()
-        for r in rows:
-            self.rows.append(r)
+            self.rows = s.scalars(query).all()
         self.model.setItems(self.rows)
 
     def load_catalog(self):
@@ -148,8 +148,8 @@ class EditCardsWindow(QMainWindow):
             return
 
         row = selected[0].row()
-        card_id = self.ui.tableView.model().items[row].id
-        if not card_id:
+        item = self.ui.tableView.model().items[row]
+        if not item.id:
             return
 
         result = QMessageBox.question(self, "Подтверждение",
@@ -162,6 +162,8 @@ class EditCardsWindow(QMainWindow):
             s.delete(card)
             s.commit()
 
+        if item.preview_image_url and Path(item.preview_image_url).exists():
+            os.remove(item.preview_image_url)
         self.load_cards()
 
     def on_buttonEdit_click(self):
