@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 
 def singleton(class_):
@@ -17,3 +18,6 @@ def dir_scan(path)-> list[str]:
         if item.is_dir():
            result.append(item.name)
     return result
+
+def now_formated():
+    return datetime.now().date().strftime("%Y-%m-%d")

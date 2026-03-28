@@ -158,18 +158,20 @@ class MainWindow(QWidget):
             category_id = session.query(Category).first().id
 
         self.clear_layout(self.grid_layout)
-        cards = session.query(Card).filter(Card.category_id == category_id, Card.invisible != True).all()
+        cards = (session.query(Card)
+                 .filter(Card.category_id == category_id, Card.invisible != True)
+                 .all())
         row = 0
         col = 0
         for card in cards:
             title = QLabel(card.title)
-            title.setAlignment(Qt.AlignCenter)
+            title.setAlignment(Qt.AlignmentFlag.AlignCenter)
             preview = QLabel()
             pixmap = QPixmap( card.preview_image_url or self.PATH_BLANK_IMG)
 
             preview.setPixmap(
                 pixmap.scaled(150, 150, Qt.AspectRatioMode.IgnoreAspectRatio))
-            preview.setAlignment(Qt.AlignCenter)
+            preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
             preview.setToolTip(card.description)
 
             button = QPushButton()
