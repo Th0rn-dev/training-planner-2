@@ -1,6 +1,5 @@
 import os.path
 import shutil
-from datetime import datetime
 
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap
@@ -8,7 +7,7 @@ from PySide6.QtWidgets import QDialog, QFileDialog, QMessageBox, QLineEdit
 
 from ui.edit_dialog_ui import Ui_Dialog as Ui_EditCardDialog
 from ui.edit_catalog_dialog_ui import Ui_Dialog as Ui_EditCatalogDialog
-from utils import dir_scan
+from utils import dir_scan, now_formated
 
 
 class EditCardDialog(QDialog):
@@ -48,10 +47,10 @@ class EditCardDialog(QDialog):
                                               'Media Files (*.mp4 *.mkv *.amv *.m4v *.mov)')
         self.validate_not_empty(path, self.ui.linkVideoEdit)
         file_name = os.path.basename(path)
-        date = datetime.now().date().strftime("%Y-%m-%d")
+        now = now_formated()
         dir_list = dir_scan(self.PATH_VIDEO)
-        video_dir = os.path.join(self.PATH_VIDEO, date)
-        if date not in dir_list:
+        video_dir = os.path.join(self.PATH_VIDEO, now)
+        if now not in dir_list:
             os.makedirs(video_dir)
         full_path = os.path.join(video_dir, file_name)
         shutil.copy(path, full_path)
@@ -69,10 +68,10 @@ class EditCardDialog(QDialog):
             Qt.AspectRatioMode.KeepAspectRatioByExpanding,
             Qt.TransformationMode.SmoothTransformation
         )
-        date = datetime.now().date().strftime("%Y-%m-%d")
+        now = now_formated()
         dir_list = dir_scan(self.PATH_IMAGES)
-        image_dir = os.path.join(self.PATH_IMAGES, date)
-        if date not in dir_list:
+        image_dir = os.path.join(self.PATH_IMAGES, now)
+        if now not in dir_list:
             os.makedirs(image_dir)
         full_path = os.path.join(image_dir, file_name)
         scaled.save(full_path)
