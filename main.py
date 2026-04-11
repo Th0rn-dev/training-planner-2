@@ -1,5 +1,4 @@
 import sys
-
 from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, \
     QPushButton, QLabel, QGridLayout, QScrollArea, QMenu, \
     QMenuBar, QTreeView
@@ -8,9 +7,11 @@ from PySide6.QtCore import Qt, QSize, QAbstractItemModel, QModelIndex
 
 from edit_cards import EditCardsWindow
 from edit_catalog import EditCatalogWindow
-from models import Card, Category
+from models import Category
 from player import Player
 from session import session
+from utils import request_cards
+
 
 class CategoryTreeModel(QAbstractItemModel):
     def __init__(self, root_categories=None, parent=None):
@@ -63,7 +64,6 @@ class CategoryTreeModel(QAbstractItemModel):
 
         return self.createIndex(row, 0, parent_item)
 
-
     def flags(self, index):
         if not index.isValid():
             return Qt.NoItemFlags
@@ -105,7 +105,6 @@ class CategoryTreeModel(QAbstractItemModel):
 
 
 class MainWindow(QWidget):
-
     PATH_PLAY_ICON = "./images/play.png"
     PATH_BLANK_IMG = "./images/blank.png"
 
@@ -158,26 +157,24 @@ class MainWindow(QWidget):
             category_id = session.query(Category).first().id
 
         self.clear_layout(self.grid_layout)
-        cards = (session.query(Card)
-                 .filter(Card.category_id == category_id, Card.invisible != True)
-                 .all())
+        cards = request_cards(category_id)
         row = 0
         col = 0
         for card in cards:
-            title = QLabel(card.title)
+            title = QLabel(card["title"])
             title.setAlignment(Qt.AlignmentFlag.AlignCenter)
             preview = QLabel()
-            pixmap = QPixmap( card.preview_image_url or self.PATH_BLANK_IMG)
+            pixmap = QPixmap(card["preview_image_url"] or self.PATH_BLANK_IMG)
 
             preview.setPixmap(
                 pixmap.scaled(150, 150, Qt.AspectRatioMode.IgnoreAspectRatio))
             preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            preview.setToolTip(card.description)
+            preview.setToolTip(card["description"])
 
             button = QPushButton()
             button.setIcon(self.play_icon)
-            button.clicked.connect(lambda checked, title=card.title,
-                                          video_url=card.video_url: self.open_video(title, video_url))
+            button.clicked.connect(lambda checked, title=card["title"],
+                                          video_url=card["video_url"]: self.open_video(title, video_url))
             button.setMaximumWidth(50)
             button.setIconSize(QSize(40, 20))
             button.setFlat(True)
@@ -235,7 +232,7 @@ class MainWindow(QWidget):
         self.opened_windows.append(self.edit_categories)
 
     def on_exitButton_click(self):
-        #ToDo тут еще надо понимать из какой категории пришли или
+        # ToDo тут еще надо понимать из какой категории пришли или
         # в какую добавили, на той и открыть карточки в основном окне
         # (логично сразу увидеть результат добавления, может быть что-то нужно будет поправить)
         self.load_categories()
