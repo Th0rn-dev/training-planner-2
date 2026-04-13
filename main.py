@@ -1,4 +1,6 @@
 import sys
+import this
+
 from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, \
     QPushButton, QLabel, QGridLayout, QScrollArea, QMenu, \
     QMenuBar, QTreeView
@@ -112,6 +114,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.categories = {}
         self.opened_windows = []
+        self.current_category = None
 
         self.setWindowTitle("Планировщик тренировок")
         self.setGeometry(100, 100, 900, 700)
@@ -155,8 +158,8 @@ class MainWindow(QWidget):
             category_id = current_index.internalPointer().id
         else:
             category_id = session.query(Category).first().id
-
         self.clear_layout(self.grid_layout)
+        self.current_category = category_id
         cards = request_cards(category_id)
         row = 0
         col = 0
@@ -220,7 +223,7 @@ class MainWindow(QWidget):
         event.accept()
 
     def edit_menu_cards(self):
-        self.edit_card = EditCardsWindow()
+        self.edit_card = EditCardsWindow(self.current_category)
         self.edit_card.exitButtonClicked.connect(self.on_exitButton_click)
         self.edit_card.show()
         self.opened_windows.append(self.edit_card)
@@ -232,9 +235,6 @@ class MainWindow(QWidget):
         self.opened_windows.append(self.edit_categories)
 
     def on_exitButton_click(self):
-        # ToDo тут еще надо понимать из какой категории пришли или
-        # в какую добавили, на той и открыть карточки в основном окне
-        # (логично сразу увидеть результат добавления, может быть что-то нужно будет поправить)
         self.load_categories()
         self.load_cards()
 

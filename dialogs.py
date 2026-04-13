@@ -17,10 +17,11 @@ class EditCardDialog(QDialog):
     PATH_IMAGES = "./images/"
     PATH_BLANK_IMG = PATH_IMAGES + "blank.png"
 
-    def __init__(self, categories, *args, **kwargs):
+    def __init__(self, categories, current_category, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.original_image = None
         self.categories = categories
+        self.current_category = current_category
         self.ui = Ui_EditCardDialog()
         self.ui.setupUi(self)
         self.ui.addButton.clicked.connect(self.accept)
@@ -31,6 +32,12 @@ class EditCardDialog(QDialog):
 
         for c in self.categories.values():
             self.ui.cmbCategory.addItem(c.name, c)
+
+        if current_category is not None:
+            index = self.ui.cmbCategory.findText(self.categories[self.current_category].name)
+            print(index)
+            if index > -1:
+                self.ui.cmbCategory.setCurrentIndex(index)
 
     def get_data(self):
         return {
@@ -86,8 +93,8 @@ class EditCardDialog(QDialog):
 
 class UpdateCardDialog(EditCardDialog):
 
-    def __init__(self, categories, init_data, *args, **kwargs):
-        super().__init__(categories, *args, **kwargs)
+    def __init__(self, categories, current_category, init_data, *args, **kwargs):
+        super().__init__(categories, current_category, *args, **kwargs)
         category_name = categories[init_data.category_id].name
         self.ui.addButton.setText("Изменить")
         self.ui.cmbCategory.setCurrentText(category_name)

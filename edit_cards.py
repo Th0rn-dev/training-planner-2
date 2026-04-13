@@ -86,10 +86,11 @@ class ItemsModel(QAbstractTableModel):
 class EditCardsWindow(QMainWindow):
     exitButtonClicked = Signal()
 
-    def __init__(self):
+    def __init__(self, current_category):
         super(EditCardsWindow, self).__init__()
         self.categories = {}
         self.rows = []
+        self.current_category = current_category
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.model = ItemsModel()
@@ -112,6 +113,7 @@ class EditCardsWindow(QMainWindow):
             query = select(Card).where(Card.category_id == category_id)
             self.rows = s.scalars(query).all()
         self.model.setItems(self.rows)
+        self.current_category = category_id
 
     def load_catalog(self):
         self.ui.comboBox.clear()
@@ -127,8 +129,13 @@ class EditCardsWindow(QMainWindow):
         for category in self.categories.values():
             self.ui.comboBox.addItem(category.name, category)
 
+        if self.current_category is not None:
+            index = self.ui.comboBox.findText(self.categories[self.current_category].name)
+            if index > -1:
+                self.ui.comboBox.setCurrentIndex(index)
+
     def on_buttonAdd_click(self):
-        dialog = EditCardDialog(self.categories)
+        dialog = EditCardDialog(self.categories, self.current_category)
         result = dialog.exec()
 
         if result == 0:
@@ -182,7 +189,7 @@ class EditCardsWindow(QMainWindow):
         if not item:
             return
 
-        dialog = UpdateCardDialog(self.categories, item)
+        dialog = UpdateCardDialog(self.categories, self.current_category, item)
 
         result = dialog.exec()
         if result == 0:
