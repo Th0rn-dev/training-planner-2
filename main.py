@@ -4,8 +4,8 @@ import this
 from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, \
     QPushButton, QLabel, QGridLayout, QScrollArea, QMenu, \
     QMenuBar, QTreeView
-from PySide6.QtGui import QPixmap, QIcon
-from PySide6.QtCore import Qt, QSize, QAbstractItemModel, QModelIndex
+from PySide6.QtGui import QPixmap, QIcon, QScreen
+from PySide6.QtCore import Qt, QSize, QAbstractItemModel, QModelIndex, QPoint
 
 from edit_cards import EditCardsWindow
 from edit_catalog import EditCatalogWindow
@@ -117,7 +117,7 @@ class MainWindow(QWidget):
         self.current_category = None
 
         self.setWindowTitle("Планировщик тренировок")
-        self.setGeometry(100, 100, 900, 700)
+        self.setGeometry(100, 100, 1400, 1000)
 
         self.menuBar = QMenuBar()
         self.addCardMenu = QMenu("Редактирование")
@@ -248,9 +248,20 @@ class MainWindow(QWidget):
                 self.clear_layout(item.layout())
             layout.removeItem(item)
 
+    def center_window(self):
+        screen = QApplication.primaryScreen()
+        if screen:
+            center = screen.availableGeometry().center()
+            geo = self.frameGeometry()
+            geo.moveCenter(center)
+            self.move(geo.topLeft())
+        else:
+            print("No screen found!")
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
+    window.center_window()
     sys.exit(app.exec())

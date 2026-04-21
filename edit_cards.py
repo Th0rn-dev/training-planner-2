@@ -136,6 +136,7 @@ class EditCardsWindow(QMainWindow):
 
     def on_buttonAdd_click(self):
         dialog = EditCardDialog(self.categories, self.current_category)
+        dialog.move(100, 100)
         result = dialog.exec()
 
         if result == 0:
