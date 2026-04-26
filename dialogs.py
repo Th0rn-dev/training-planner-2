@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QDialog, QFileDialog, QMessageBox, QLineEdit
 
+from constants import PATH_VIDEO, PATH_IMAGES, PATH_BLANK_IMG
 from ui.edit_dialog_ui import Ui_Dialog as Ui_EditCardDialog
 from ui.edit_catalog_dialog_ui import Ui_Dialog as Ui_EditCatalogDialog
 from utils import dir_scan, now_formated
@@ -12,10 +13,6 @@ from utils import dir_scan, now_formated
 
 class EditCardDialog(QDialog):
     """Диалог добавления карточки"""
-
-    PATH_VIDEO = "./video/"
-    PATH_IMAGES = "./images/"
-    PATH_BLANK_IMG = PATH_IMAGES + "blank.png"
 
     def __init__(self, categories, current_category, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -28,14 +25,14 @@ class EditCardDialog(QDialog):
         self.ui.cancelButton.clicked.connect(self.reject)
         self.ui.addVideoButton.clicked.connect(self.add_video_file)
         self.ui.addImageButton.clicked.connect(self.add_img_file)
-        self.ui.labelForPreview.setPixmap(QPixmap(self.PATH_BLANK_IMG))
+        self.ui.labelForPreview.setPixmap(QPixmap(PATH_BLANK_IMG))
 
         for c in self.categories.values():
             self.ui.cmbCategory.addItem(c.name, c)
 
         if current_category is not None:
-            index = self.ui.cmbCategory.findText(self.categories[self.current_category].name)
-            print(index)
+            name = self.categories[self.current_category].name
+            index = self.ui.cmbCategory.findText(name)
             if index > -1:
                 self.ui.cmbCategory.setCurrentIndex(index)
 
@@ -55,8 +52,8 @@ class EditCardDialog(QDialog):
         self.validate_not_empty(path, self.ui.linkVideoEdit)
         file_name = os.path.basename(path)
         now = now_formated()
-        dir_list = dir_scan(self.PATH_VIDEO)
-        video_dir = os.path.join(self.PATH_VIDEO, now)
+        dir_list = dir_scan(PATH_VIDEO)
+        video_dir = os.path.join(PATH_VIDEO, now)
         if now not in dir_list:
             os.makedirs(video_dir)
         full_path = os.path.join(video_dir, file_name)
@@ -76,8 +73,8 @@ class EditCardDialog(QDialog):
             Qt.TransformationMode.SmoothTransformation
         )
         now = now_formated()
-        dir_list = dir_scan(self.PATH_IMAGES)
-        image_dir = os.path.join(self.PATH_IMAGES, now)
+        dir_list = dir_scan(PATH_IMAGES)
+        image_dir = os.path.join(PATH_IMAGES, now)
         if now not in dir_list:
             os.makedirs(image_dir)
         full_path = os.path.join(image_dir, file_name)
@@ -95,15 +92,15 @@ class UpdateCardDialog(EditCardDialog):
 
     def __init__(self, categories, current_category, init_data, *args, **kwargs):
         super().__init__(categories, current_category, *args, **kwargs)
-        category_name = categories[init_data.category_id].name
+        category_name = categories[current_category].name
         self.ui.addButton.setText("Изменить")
         self.ui.cmbCategory.setCurrentText(category_name)
-        self.ui.titleEdit.setText(str(init_data.title))
-        self.ui.linkImgEdit.setText(str(init_data.preview_image_url))
-        self.ui.linkVideoEdit.setText(str(init_data.video_url))
-        self.ui.checkBox.setChecked(init_data.invisible)
-        self.ui.descriptionEdit.appendPlainText(init_data.description)
-        self.ui.labelForPreview.setPixmap(QPixmap(init_data.preview_image_url or self.PATH_BLANK_IMG))
+        self.ui.titleEdit.setText(str(init_data["title"]))
+        self.ui.linkImgEdit.setText(str(init_data["preview_image_url"]))
+        self.ui.linkVideoEdit.setText(str(init_data["video_url"]))
+        self.ui.checkBox.setChecked(init_data["invisible"])
+        self.ui.descriptionEdit.appendPlainText(init_data["description"])
+        self.ui.labelForPreview.setPixmap(QPixmap(init_data["preview_image_url"] or PATH_BLANK_IMG))
 
 
 class EditCatalogDialog(QDialog):
@@ -135,7 +132,7 @@ class UpdateCatalogDialog(EditCatalogDialog):
     """Диалог изменения категории"""
 
     def __init__(self, categories, init_data, *args, **kwargs):
-        super().__init__( categories, *args, **kwargs)
+        super().__init__(categories, *args, **kwargs)
         category_name = init_data.name
         category_parent = init_data.parent_id
         if category_parent is not None:
