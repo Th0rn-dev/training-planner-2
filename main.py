@@ -1,18 +1,18 @@
 import sys
-import this
 
 from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, \
     QPushButton, QLabel, QGridLayout, QScrollArea, QMenu, \
     QMenuBar, QTreeView
-from PySide6.QtGui import QPixmap, QIcon, QScreen
-from PySide6.QtCore import Qt, QSize, QAbstractItemModel, QModelIndex, QPoint
+from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtCore import Qt, QSize, QAbstractItemModel, QModelIndex
 
 from edit_cards import EditCardsWindow
 from edit_catalog import EditCatalogWindow
 from models import Category
 from player import Player
 from session import session
-from utils import request_cards
+from utils import request_cards, get_first_category_id
+from constants import PATH_PLAY_ICON, PATH_BLANK_IMG
 
 
 class CategoryTreeModel(QAbstractItemModel):
@@ -107,8 +107,7 @@ class CategoryTreeModel(QAbstractItemModel):
 
 
 class MainWindow(QWidget):
-    PATH_PLAY_ICON = "./images/play.png"
-    PATH_BLANK_IMG = "./images/blank.png"
+    """Главное окно приложения"""
 
     def __init__(self):
         super().__init__()
@@ -147,7 +146,7 @@ class MainWindow(QWidget):
         self.layout.setMenuBar(self.menuBar)
         self.setLayout(self.layout)
 
-        self.play_icon = QIcon(self.PATH_PLAY_ICON)
+        self.play_icon = QIcon(PATH_PLAY_ICON)
 
         self.load_categories()
         self.load_cards()
@@ -157,7 +156,7 @@ class MainWindow(QWidget):
         if current_index.isValid():
             category_id = current_index.internalPointer().id
         else:
-            category_id = session.query(Category).first().id
+            category_id = get_first_category_id()
         self.clear_layout(self.grid_layout)
         self.current_category = category_id
         cards = request_cards(category_id)
@@ -167,8 +166,7 @@ class MainWindow(QWidget):
             title = QLabel(card["title"])
             title.setAlignment(Qt.AlignmentFlag.AlignCenter)
             preview = QLabel()
-            pixmap = QPixmap(card["preview_image_url"] or self.PATH_BLANK_IMG)
-
+            pixmap = QPixmap(card["preview_image_url"] or PATH_BLANK_IMG)
             preview.setPixmap(
                 pixmap.scaled(150, 150, Qt.AspectRatioMode.IgnoreAspectRatio))
             preview.setAlignment(Qt.AlignmentFlag.AlignCenter)

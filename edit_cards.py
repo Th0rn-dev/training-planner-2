@@ -1,16 +1,18 @@
 import os
+import uuid
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QModelIndex, QAbstractTableModel, Signal
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QMainWindow, \
     QMessageBox, QAbstractItemView
-from sqlalchemy import select, update, insert
+from sqlalchemy import select, update, insert, delete
 
 from models import Card, Category
 from ui.edit_ui import Ui_MainWindow
 from dialogs import EditCardDialog, UpdateCardDialog
 from session import session
+from utils import request_cards
 
 
 class ItemsModel(QAbstractTableModel):
@@ -40,13 +42,13 @@ class ItemsModel(QAbstractTableModel):
             if col == 0:
                 return f"{index.row() + 1}"
             if col == 1:
-                return f"{info.title}"
+                return f"{info["title"]}"
             if col == 2:
-                return f"{info.preview_image_url}" or "empty"
+                return f"{info["preview_image_url"]}" or "empty"
             if col == 3:
-                return f"{info.video_url}"
-            if col == 4:
-                return f"{info.invisible}" or "empty"
+                return f"{info["video_url"]}"
+            # if col == 4:
+            #     return f"{info.invisible}" or "empty"
         return None
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole):
@@ -109,9 +111,16 @@ class EditCardsWindow(QMainWindow):
     def load_cards(self):
         self.ui.tableView.model().items.clear()
         category_id = self.ui.comboBox.currentData().id
-        with session as s:
-            query = select(Card).where(Card.category_id == category_id)
-            self.rows = s.scalars(query).all()
+        cards = request_cards(category_id, all=True)
+        for card in cards:
+            row = dict()
+            row["id"] = card["id"]
+            row["title"] = card["title"]
+            row["preview_image_url"] = card["preview_image_url"]
+            row["video_url"] = card["video_url"]
+            row["description"] = card["description"]
+            row["invisible"] = card["invisible"]
+            self.rows.append(row)
         self.model.setItems(self.rows)
         self.current_category = category_id
 
@@ -130,7 +139,8 @@ class EditCardsWindow(QMainWindow):
             self.ui.comboBox.addItem(category.name, category)
 
         if self.current_category is not None:
-            index = self.ui.comboBox.findText(self.categories[self.current_category].name)
+            name = self.categories[uuid.UUID(self.current_category)].name
+            index = self.ui.comboBox.findText(name)
             if index > -1:
                 self.ui.comboBox.setCurrentIndex(index)
 
@@ -157,7 +167,7 @@ class EditCardsWindow(QMainWindow):
 
         row = selected[0].row()
         item = self.ui.tableView.model().items[row]
-        if not item.id:
+        if item["id"] is None:
             return
 
         result = QMessageBox.question(self, "Подтверждение",
@@ -167,11 +177,18 @@ class EditCardsWindow(QMainWindow):
 
         with session as s:
             card = self.rows[row]
-            s.delete(card)
+            query = delete(Card).where(Card.id == card["id"])
+            s.execute(query)
             s.commit()
 
-        if item.preview_image_url and Path(item.preview_image_url).exists():
-            os.remove(item.preview_image_url)
+        preview = item["preview_image_url"]
+        if preview and Path(preview).exists():
+            os.remove(item["preview_image_url"])
+
+        video = item["video_url"]
+        if video and Path(video).exists():
+            os.remove(video)
+
         self.load_cards()
 
     def on_buttonEdit_click(self):
@@ -197,7 +214,7 @@ class EditCardsWindow(QMainWindow):
             return
         data = dialog.get_data()
         with session as s:
-            query = update(Card).where(Card.id.in_([item.id]))
+            query = update(Card).where(Card.id.in_([item["id"]]))
             s.execute(query, data)
             s.commit()
         self.load_cards()
