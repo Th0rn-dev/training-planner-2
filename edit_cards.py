@@ -139,7 +139,7 @@ class EditCardsWindow(QMainWindow):
             self.ui.comboBox.addItem(category.name, category)
 
         if self.current_category is not None:
-            name = self.categories[uuid.UUID(self.current_category)].name
+            name = self.categories[self.current_category].name
             index = self.ui.comboBox.findText(name)
             if index > -1:
                 self.ui.comboBox.setCurrentIndex(index)
