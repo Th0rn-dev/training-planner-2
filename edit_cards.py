@@ -2,8 +2,9 @@ import os
 import uuid
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QModelIndex, QAbstractTableModel, Signal
+from PySide6.QtCore import Qt, QModelIndex, QAbstractTableModel, Signal, QSize
 from PySide6 import QtWidgets
+from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QMainWindow, \
     QMessageBox, QAbstractItemView
 from sqlalchemy import select, update, insert, delete
@@ -35,20 +36,26 @@ class ItemsModel(QAbstractTableModel):
     def data(self, index: QModelIndex, role: Qt.ItemDataRole):
         if not index.isValid():
             return None
-
+        info = self.items[index.row()]
+        col = index.column()
         if role == Qt.ItemDataRole.DisplayRole:
-            info = self.items[index.row()]
-            col = index.column()
             if col == 0:
                 return f"{index.row() + 1}"
             if col == 1:
                 return f"{info["title"]}"
-            if col == 2:
-                return f"{info["preview_image_url"]}" or "empty"
             if col == 3:
                 return f"{info["video_url"]}"
             # if col == 4:
             #     return f"{info.invisible}" or "empty"
+
+        if role == Qt.ItemDataRole.DecorationRole:
+            if col == 2:
+                path = Path(info["preview_image_url"])
+                pixmap = QPixmap(path)
+                if not pixmap.isNull():
+                    return pixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio,
+                                         Qt.TransformationMode.SmoothTransformation)
+            return "empty"
         return None
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole):
