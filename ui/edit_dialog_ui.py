@@ -23,7 +23,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(460, 780)
+        Dialog.resize(460, 811)
         self.label = QLabel(Dialog)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(9, 9, 80, 16))
@@ -50,10 +50,10 @@ class Ui_Dialog(object):
         self.linkVideoEdit.setGeometry(QRect(9, 420, 350, 21))
         self.addButton = QPushButton(Dialog)
         self.addButton.setObjectName(u"addButton")
-        self.addButton.setGeometry(QRect(360, 740, 78, 24))
+        self.addButton.setGeometry(QRect(360, 770, 78, 24))
         self.cancelButton = QPushButton(Dialog)
         self.cancelButton.setObjectName(u"cancelButton")
-        self.cancelButton.setGeometry(QRect(250, 740, 78, 24))
+        self.cancelButton.setGeometry(QRect(250, 770, 78, 24))
         self.addVideoButton = QPushButton(Dialog)
         self.addVideoButton.setObjectName(u"addVideoButton")
         self.addVideoButton.setGeometry(QRect(370, 420, 75, 21))
@@ -68,10 +68,20 @@ class Ui_Dialog(object):
         self.label_5.setGeometry(QRect(10, 60, 160, 18))
         self.descriptionEdit = QPlainTextEdit(Dialog)
         self.descriptionEdit.setObjectName(u"descriptionEdit")
-        self.descriptionEdit.setGeometry(QRect(10, 460, 435, 270))
+        self.descriptionEdit.setGeometry(QRect(10, 490, 435, 270))
         self.labelForPreview = QLabel(Dialog)
         self.labelForPreview.setObjectName(u"labelForPreview")
         self.labelForPreview.setGeometry(QRect(10, 200, 150, 150))
+        self.playButton = QPushButton(Dialog)
+        self.playButton.setObjectName(u"playButton")
+        self.playButton.setGeometry(QRect(10, 450, 51, 26))
+        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.MediaPlaybackStart))
+        self.playButton.setIcon(icon)
+        self.closeButton = QPushButton(Dialog)
+        self.closeButton.setObjectName(u"closeButton")
+        self.closeButton.setGeometry(QRect(80, 450, 61, 26))
+        icon1 = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.ProcessStop))
+        self.closeButton.setIcon(icon1)
 
         self.retranslateUi(Dialog)
 
@@ -91,5 +101,7 @@ class Ui_Dialog(object):
         self.checkBox.setText(QCoreApplication.translate("Dialog", u"\u043d\u0435 \u043e\u0442\u043e\u0431\u0440\u0430\u0436\u0430\u0442\u044c", None))
         self.label_5.setText(QCoreApplication.translate("Dialog", u"\u0412\u0438\u0434\u043e\u043c\u043e\u0441\u0442\u044c \u0432 \u043a\u0430\u0442\u0430\u043b\u043e\u0433\u0435", None))
         self.labelForPreview.setText("")
+        self.playButton.setText("")
+        self.closeButton.setText("")
     # retranslateUi
 

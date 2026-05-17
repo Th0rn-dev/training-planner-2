@@ -1,5 +1,4 @@
 import os
-import uuid
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QModelIndex, QAbstractTableModel, Signal, QSize
@@ -50,7 +49,7 @@ class ItemsModel(QAbstractTableModel):
 
         if role == Qt.ItemDataRole.DecorationRole:
             if col == 2:
-                path = Path(info["preview_image_url"])
+                path = Path(str(info["preview_image_url"]))
                 pixmap = QPixmap(path)
                 if not pixmap.isNull():
                     return pixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio,
