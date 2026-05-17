@@ -6,6 +6,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QDialog, QFileDialog, QMessageBox, QLineEdit
 
 from constants import PATH_VIDEO, PATH_IMAGES, PATH_BLANK_IMG
+from player import Player
 from ui.edit_dialog_ui import Ui_Dialog as Ui_EditCardDialog
 from ui.edit_catalog_dialog_ui import Ui_Dialog as Ui_EditCatalogDialog
 from utils import dir_scan, now_formated
@@ -19,6 +20,8 @@ class EditCardDialog(QDialog):
         self.original_image = None
         self.categories = categories
         self.current_category = current_category
+        self.opened_windows = []
+        self.player = None
         self.ui = Ui_EditCardDialog()
         self.ui.setupUi(self)
         self.ui.addButton.clicked.connect(self.accept)
@@ -26,6 +29,8 @@ class EditCardDialog(QDialog):
         self.ui.addVideoButton.clicked.connect(self.add_video_file)
         self.ui.addImageButton.clicked.connect(self.add_img_file)
         self.ui.labelForPreview.setPixmap(QPixmap(PATH_BLANK_IMG))
+        self.ui.playButton.clicked.connect(lambda checked: self.open_player())
+        self.ui.closeButton.clicked.connect(self.close_player)
 
         for c in self.categories.values():
             self.ui.cmbCategory.addItem(c.name, c)
@@ -86,6 +91,23 @@ class EditCardDialog(QDialog):
     def validate_not_empty(self, path: str, edit_field: QLineEdit):
         if not path and not edit_field.text():
             QMessageBox.warning(self, "Выбор файла", "Файл не выбран")
+
+    def open_player(self):
+        """Запуск плеера для предпросмотра видео, установленного в карточке"""
+        if self.player is None or not self.player.isVisible():
+            self.player = Player()
+            self.player.setWindowTitle("Предварительный просмотр")
+            video_path = self.get_data()["video_url"]
+            self.player.player.setSource(video_path)
+
+            self.player.show()
+            self.player.player.play()
+
+    def close_player(self):
+        """Закрываем плеер программно"""
+        if self.player and self.player.isVisible():
+            self.player.close()  # Это вызовет closeEvent в классе Player
+            self.player = None
 
 
 class UpdateCardDialog(EditCardDialog):

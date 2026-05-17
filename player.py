@@ -5,12 +5,12 @@ Contains MainWindow class
 
 from functools import partial
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent, QUrl
 from PySide6.QtGui import QShortcut, QKeySequence
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PySide6.QtWidgets import QMainWindow, QToolBar, QStyle, QSlider, QWidget, \
     QVBoxLayout, \
-    QLabel, QHBoxLayout
+    QLabel, QHBoxLayout, QDialog
 
 from custom_video_widget import CustomVideoWidget
 from utils import singleton
@@ -19,8 +19,8 @@ from utils import singleton
 @singleton
 class Player(QMainWindow):
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
         self.setGeometry(400, 150, 800, 600)
         self.current_movie_duration = 0
         self.setup_ui()
@@ -184,6 +184,16 @@ class Player(QMainWindow):
         self.current_movie_duration = duration
         self.slider.setRange(0, duration)
         self.lab_remaining_time.setText(format_time(duration))
+
+    def closeEvent(self, event: QEvent):
+        """Обрабатываем закрытие окна плеера по крестику"""
+        # 1. Останавливаем воспроизведение (если есть медиаплеер)
+        if hasattr(self, 'player') and self.player.mediaStatus() != QMediaPlayer.NoMedia:
+            self.player.stop()
+            # Отключаем источник, чтобы освободить файл
+            self.player.setSource(QUrl())
+        # 3. Разрешаем закрытие окна
+        event.accept()
 
 
 def format_time(duration_ms: int):
