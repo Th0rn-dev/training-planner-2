@@ -38,7 +38,7 @@ class ItemsModel(QAbstractTableModel):
             if col == 1:
                 return f"{info.name}"
             if col == 2:
-                return f"{info.parent.name}"
+                return  f"{info.parent.name}" if info.parent else ""
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole):
         if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
