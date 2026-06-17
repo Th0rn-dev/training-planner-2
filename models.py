@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import String, ForeignKey, Text, Boolean
+from sqlalchemy import String, ForeignKey, Text, Boolean, Date
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
@@ -62,3 +62,32 @@ class Comment(Base):
     comment: Mapped[str] = mapped_column(Text)
     user = relationship("User")
     card = relationship("Card")
+
+
+class TrainingSession(Base):
+    __tablename__ = 'training_session'
+
+    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    created_at: Mapped[Date] = mapped_column(Date, nullable=False)
+    training_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    description: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+
+    def __repr__(self) -> str:
+        return (f"<TrainingSession(id={self.id}, created_at={self.created_at}, training_date={self.training_date}, "
+                f"description={self.description})>")
+
+
+class TrainingAction(Base):
+    __tablename__ = 'training_action'
+
+    id: Mapped[PG_UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    card_id: Mapped[PG_UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey('cards.id'), nullable=True)
+    duration: Mapped[int] = mapped_column(nullable=False)
+    training_session_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey('training_session.id'),
+                                                           nullable=False)
+    training_session = relationship("TrainingSession")
+    card = relationship("Card")
+
+    def __repr__(self) -> str:
+        return (f"<TrainingAction(id={self.id}, card_id={self.card_id}, duration={self.duration}, "
+                f"training_session_id={self.training_session_id})>")

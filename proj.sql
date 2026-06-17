@@ -33,3 +33,23 @@ CREATE TABLE comments (
     card_id UUID REFERENCES cards(id),
     comment TEXT
 );
+
+CREATE TABLE training_session (
+    id UUID NOT NULL,
+    created_at DATE NOT NULL,
+    training_date DATE NOT NULL,
+    description VARCHAR(1000),
+
+    CONSTRAINT pk_training_session PRIMARY KEY (id)
+);
+
+CREATE TABLE training_action (
+    id UUID NOT NULL,
+    card_id UUID,
+    duration BIGINT NOT NULL,
+    training_session_id UUID NOT NULL,
+
+    CONSTRAINT pk_training_action PRIMARY KEY (id),
+    CONSTRAINT fk_training_action_card FOREIGN KEY (card_id) REFERENCES card(id),
+    CONSTRAINT fk_training_action_training_session FOREIGN KEY (training_session_id) REFERENCES training_session(id)
+);
