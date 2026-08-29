@@ -2,7 +2,7 @@ import sys
 
 from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, \
     QPushButton, QLabel, QGridLayout, QScrollArea, QMenu, \
-    QMenuBar, QTreeView
+    QMenuBar, QTreeView, QAbstractItemView
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtCore import Qt, QSize, QAbstractItemModel, QModelIndex
 
@@ -10,9 +10,10 @@ from edit_cards import EditCardsWindow
 from edit_catalog import EditCatalogWindow
 from models import Category
 from player import Player
+from preview_stat import PreviewStatisticWindow
 from session import session
-from utils import request_cards, get_first_category_id
-from constants import PATH_PLAY_ICON, PATH_BLANK_IMG
+from utils import request_cards, get_first_category_id, media_statistic
+from constants import PATH_PLAY_ICON, PATH_BLANK_IMG, PATH_IMAGES, PATH_VIDEO
 
 
 class CategoryTreeModel(QAbstractItemModel):
@@ -29,10 +30,10 @@ class CategoryTreeModel(QAbstractItemModel):
             return len(parent_item.children)
         return len(self.root_items)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid():
             return None
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             item = index.internalPointer()
             return item.name
         return None
@@ -111,6 +112,7 @@ class MainWindow(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.stat = None
         self.categories = {}
         self.opened_windows = []
         self.current_category = None
@@ -124,12 +126,17 @@ class MainWindow(QWidget):
         self.addCardMenu.addAction("Карточки", self.edit_menu_cards)
         self.addCardMenu.addAction("Категории", self.edit_menu_categories)
 
+        self.fileStatMenu = QMenu("Статистика")
+        self.menuBar.addMenu(self.fileStatMenu)
+        self.fileStatMenu.addAction("Превью", self.stat_preview_images)
+        self.fileStatMenu.addAction("Видео", self.stat_preview_video)
+
         self.layout = QHBoxLayout()
         # Список категорий
         self.category = QTreeView(self)
         self.category.setHeaderHidden(True)
-        self.category.setSelectionMode(QTreeView.SingleSelection)
-        self.category.setSelectionBehavior(QTreeView.SelectRows)
+        self.category.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.category.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.category.setMaximumWidth(250)
         self.category_model = CategoryTreeModel(self)
         self.category.setModel(self.category_model)
@@ -255,6 +262,18 @@ class MainWindow(QWidget):
             self.move(geo.topLeft())
         else:
             print("No screen found!")
+
+    def stat_preview_images(self):
+        stat = media_statistic(PATH_IMAGES)
+        self.stat = PreviewStatisticWindow(stat)
+        self.stat.show()
+        self.opened_windows.append(self.stat)
+
+    def stat_preview_video(self):
+        stat = media_statistic(PATH_VIDEO)
+        self.stat = PreviewStatisticWindow(stat)
+        self.stat.show()
+        self.opened_windows.append(self.stat)
 
 
 if __name__ == '__main__':
